@@ -415,8 +415,35 @@
             }
         }
 
-        <!-- Forms Layout -->
-        <div class="form-group">
+        /* Segmented Control per il Grafico */
+        .segmented-control {
+            display: flex;
+            background-color: #f0f0f2;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .seg-btn {
+            background: transparent;
+            border: none;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .seg-btn.active {
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        /* Forms Layout */
+        .form-group {
             margin-bottom: 14px;
         }
 
@@ -725,7 +752,13 @@
 
         <!-- NEW GRAPHICS CARD (LARGER DIAMETER, BETTER VISIBILITY, DETAILED LEGEND) -->
         <div class="card">
-            <div class="card-header-title">Spese Suddivise per Categoria</div>
+            <div class="card-header-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span>Spese per Categoria</span>
+                <div class="segmented-control">
+                    <button class="seg-btn active" id="btnChartTotal" onclick="setChartMode('total')">Totali</button>
+                    <button class="seg-btn" id="btnChartToPay" onclick="setChartMode('topay')">Da Sostenere</button>
+                </div>
+            </div>
             <div class="graphics-layout">
                 <!-- Large SVG Donut -->
                 <div class="chart-box-main">
@@ -736,7 +769,7 @@
                             <!-- Programmatically segmented rings -->
                         </svg>
                         <div class="chart-info">
-                            <div class="label">Previsione</div>
+                            <div class="label" id="chartCenterLabel">Totale</div>
                             <div class="value" id="chartCenterTotal">0€</div>
                         </div>
                     </div>
@@ -878,6 +911,16 @@
         },
         currentTrip: "La Mia Vacanza"
     };
+
+    // State per il Grafico a Ciambella
+    let chartMode = 'total';
+
+    function setChartMode(mode) {
+        chartMode = mode;
+        document.getElementById('btnChartTotal').classList.toggle('active', mode === 'total');
+        document.getElementById('btnChartToPay').classList.toggle('active', mode === 'topay');
+        calculateAndRender();
+    }
 
     // Life-Cycle Bootstrapping Engine
     window.onload = function() {
@@ -1118,7 +1161,8 @@
         let localToPay = 0;
         let absoluteMinDate = null;
         let absoluteMaxDate = null;
-        let catTotals = {}; // Dynamic object to support infinite custom categories
+        let catTotals = {}; // Per i costi totali
+        let catTotalsToPay = {}; // Per i costi ancora da sostenere
 
         // Global Consolidation Aggregators (ALL TRIPS)
         let globalGrandTotalAllTrips = 0;
@@ -1141,10 +1185,13 @@
                     if (!catTotals[exp.category]) catTotals[exp.category] = 0;
                     catTotals[exp.category] += val;
 
+                    if (!catTotalsToPay[exp.category]) catTotalsToPay[exp.category] = 0;
+
                     if(exp.paid) {
                         localPaid += val;
                     } else {
                         localToPay += val;
+                        catTotalsToPay[exp.category] += val; // Somma qui solo se da pagare
                     }
 
                     if(exp.start) {
@@ -1180,8 +1227,15 @@
         const dailyAvg = localTotal / daysCount;
         document.getElementById('kpiDailyAvg').innerText = dailyAvg.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
 
+        // Determina quali dati passare al grafico in base allo Switch attivato
+        const activeCatTotals = chartMode === 'total' ? catTotals : catTotalsToPay;
+        const activeChartTotal = chartMode === 'total' ? localTotal : localToPay;
+
+        document.getElementById('chartCenterTotal').innerText = Math.round(activeChartTotal) + " €";
+        document.getElementById('chartCenterLabel').innerText = chartMode === 'total' ? "Totale" : "Da Pagare";
+
         // Build charts and legends dynamically 
-        renderEnhancedDonutChart(catTotals, localTotal);
+        renderEnhancedDonutChart(activeCatTotals, activeChartTotal);
         renderExpenseList(currentSelectedTrip.expenses);
     }
 
@@ -1195,9 +1249,9 @@
         dynamicallyGeneratedRings.forEach(node => node.remove());
         legendContainer.innerHTML = '';
 
-        if (globalTotal === 0) {
+        if (globalTotal <= 0 || isNaN(globalTotal)) {
             // Empty state for visual graph representation
-            legendContainer.innerHTML = `<div class="empty-state">Nessuna categoria attiva. Aggiungi spese.</div>`;
+            legendContainer.innerHTML = `<div class="empty-state" style="padding-top:10px;">Nessuna spesa in questa visualizzazione.</div>`;
             return;
         }
 
@@ -1209,13 +1263,15 @@
             .sort((a, b) => b.val - a.val);
 
         sortedCategories.forEach(item => {
-            if (item.val === 0) return;
+            if (item.val <= 0) return;
 
             const percentage = (item.val / globalTotal) * 100;
-            const strokeDashArray = `${percentage} ${100 - percentage}`;
-            const strokeDashOffset = 100 - cumulativePercent + 25; // standard alignment to rotation starting apex
-
             const catColor = getCategoryColor(item.category);
+
+            // FIX INFALLIBILE: Metodo di Rotazione Geometrica Nativa
+            // Evita bug di sovrapposizione su Safari e iOS ruotando il punto d'inizio del cerchio
+            const rotateAngle = -90 + (cumulativePercent * 3.6); // 360 gradi diviso 100 = 3.6
+            const strokeDashArray = `${percentage} ${100 - percentage}`;
 
             // 1. Append circle sector node into SVG tree
             const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -1227,7 +1283,7 @@
             circleNode.setAttribute("stroke", catColor);
             circleNode.setAttribute("stroke-width", "8"); // Thick Apple watch profile indicator styles
             circleNode.setAttribute("stroke-dasharray", strokeDashArray);
-            circleNode.setAttribute("stroke-dashoffset", strokeDashOffset.toString());
+            circleNode.setAttribute("transform", `rotate(${rotateAngle} 21 21)`); // Calcolo assoluto posizione
             
             svg.appendChild(circleNode);
             cumulativePercent += percentage;
