@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Travel Budget</title>
+    <link rel="icon" href="favicon.ico">
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --panel-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent: #0071e3;
+            --accent-light: #f5f9ff;
+            --success: #34c759;
+            --success-light: #f0fbf2;
+            --warning: #ff9500;
+            --warning-light: #fff9f0;
+            --border-color: #e5e5ea;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.4;
+            padding: 24px 12px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Navigation Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+        }
+
+        .logo-area h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-area p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Buttons Style Apple */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background-color: var(--panel-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover {
+            background-color: #fafafa;
+            border-color: #c7c7cc;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0077ed;
+        }
+
+        .btn-danger {
+            color: #ff3b30;
+            border-color: #ffcccc;
+        }
+
+        .btn-danger:hover {
+            background-color: #fff2f1;
+            border-color: #ff3b30;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* GLOBAL PORTFOLIO PANEL (All Trips) */
+        .global-portfolio-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-main);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .global-portfolio-card {
+                grid-template-columns: 1.2fr 2fr;
+                align-items: center;
+            }
+        }
+
+        .portfolio-title-area h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .portfolio-title-area p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 320px;
+        }
+
+        .portfolio-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 480px) {
+            .portfolio-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .portfolio-box {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .portfolio-box .lbl {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .portfolio-box .val {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .portfolio-box .val.accent-green {
+            color: var(--success);
+        }
+
+        /* Selector & Trip Level Navigation */
+        .trip-selector-card {
+            background-color: var(--panel-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 10px 40px 10px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-family);
+            font-size: 15px;
+            font-weight: 500;
+            background-color: #f5f5f7;
+            color: var(--text-main);
+            min-width: 240px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        .select-wrapper::after {
+            content: '▲▼';
+            font-size: 9px;
+            color: var(--text-secondary);
+            right: 16px;
+            top: 15px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Dashboard & Detailed Graphs */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .card-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .kpi-box {
+            padding: 14px;
+            background-color: #fbfbfd;
+            border-radius: var(--radius-md);
+            border: 1px solid #f0f0f2;
+        }
+
+        .kpi-box.main-total {
+            background-color: var(--accent-light);
+            border-color: #d1e3f7;
+            grid-column: span 2;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-value {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-box.main-total .kpi-value {
+            font-size: 24px;
+        }
+
+        /* BIG EXPANDED GRAPHICS AREA */
+        .graphics-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+
+        @media (min-width: 480px) {
+            .graphics-layout {
+                grid-template-columns: 1.2fr 1.8fr;
+            }
+        }
+
+        .chart-box-main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .chart-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .chart-info .label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .chart-info .value {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Detailed Legend Elements */
+        .graph-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #f0f0f2;
+        }
+
+        .legend-item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-cat-name {
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .legend-item-right {
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        .legend-val {
+            font-weight: 600;
+        }
+
+        .legend-pct {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        /* Workspace Core Splits */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .workspace-grid {
+                grid-template-columns: 1.2fr 1.8fr;
+            }
+        }
+
+        /* Forms Layout */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-family);
+            font-size: 14px;
+            outline: none;
+            background-color: #f5f5f7;
+            transition: all 0.15s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .row-dates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* iOS style Toggle switches */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background-color: #f5f5f7;
+            border-radius: var(--radius-md);
+            margin-top: 16px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-color);
+            transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Database Records Lists */
+        .expense-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background-color: var(--panel-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .expense-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-icon-wrapper {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .expense-details .title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .expense-details .meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .expense-item-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .expense-price {
+            text-align: right;
+        }
+
+        .expense-price .amount {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .expense-price .status-badge {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .status-badge.paid {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-badge.pending {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            border-radius: 6px;
+            transition: all 0.1s;
+        }
+
+        .delete-btn:hover {
+            color: #ff3b30;
+            background-color: #fff2f1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* Clean vector Apple-style iconography */
+        .icon {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+
+        /* System utilities elements hidden */
+        #fileInput, #excelInput { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- Top System Header -->
+    <header>
+        <div class="logo-area">
+            <h1>Smart Travel Budget</h1>
+            <p>Pianificazione finanziaria per i tuoi viaggi</p>
+        </div>
+        <div class="button-group">
+            <button class="btn" onclick="triggerImportJSON()" title="Importa JSON">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg> Importa JSON
+            </button>
+            <button class="btn" onclick="exportJSON()" title="Esporta JSON">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg> Esporta JSON
+            </button>
+            <button class="btn" onclick="triggerImportCSV()" title="Importa CSV (Excel)">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Importa CSV
+            </button>
+            <button class="btn" onclick="exportCSV()" title="Esporta CSV (Excel)">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-4 7h2v2H9v-2zm0-3h2v2H9v-2zm0-3h2v2H9V10z"/></svg> Esporta CSV
+            </button>
+            <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+            <input type="file" id="excelInput" accept=".csv" onchange="importCSV(event)">
+        </div>
+    </header>
+
+    <!-- PORTFOLIO CARD (NEW: ALL VACATIONS COMPREHENSIVE OVERVIEW) -->
+    <div class="global-portfolio-card">
+        <div class="portfolio-title-area">
+            <h2>Portafoglio Globale</h2>
+            <p>Computo consolidato di tutte le vacanze future salvate nel tuo archivio locale.</p>
+        </div>
+        <div class="portfolio-stats">
+            <div class="portfolio-box">
+                <div class="lbl">Spesa Totale Impegnata</div>
+                <div class="val" id="globalKpiTotal">0,00 €</div>
+            </div>
+            <div class="portfolio-box">
+                <div class="lbl">Liquidità da Preparare</div>
+                <div class="val accent-green" id="globalKpiToPay">0,00 €</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Vacation Navigation Bar -->
+    <div class="trip-selector-card">
+        <div class="select-wrapper">
+            <select id="tripSelect" onchange="switchTrip()">
+                <!-- Populated dynamically via controller logic -->
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="createNewTrip()">
+                <svg class="icon" style="fill:white" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Nuova Vacanza
+            </button>
+            <button class="btn btn-danger" onclick="deleteCurrentTrip()">Elimina Vacanza</button>
+        </div>
+    </div>
+
+    <!-- Active Analytics Panel Dashboard -->
+    <div class="dashboard-grid">
+        
+        <!-- Numerical KPI Indicators -->
+        <div class="card">
+            <div class="card-header-title">Analisi Finanziaria Vacanza</div>
+            <div class="kpi-container">
+                <div class="kpi-box main-total">
+                    <div class="kpi-label">Costo Totale Vacanza</div>
+                    <div class="kpi-value" id="kpiTotal">0,00 €</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Budget Stimato</div>
+                    <div class="kpi-value" id="kpiBudget">0,00 €</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Spesa Media Giornaliera</div>
+                    <div class="kpi-value" id="kpiDailyAvg">0,00 €</div>
+                </div>
+                <div class="kpi-box" style="background-color: var(--success-light); border-color: #d8f3df;">
+                    <div class="kpi-label" style="color: var(--success)">Anticipi Pagati</div>
+                    <div class="kpi-value" style="color: var(--success)" id="kpiPaid">0,00 €</div>
+                </div>
+                <div class="kpi-box" style="background-color: var(--warning-light); border-color: #ffe6cc;">
+                    <div class="kpi-label" style="color: var(--warning)">Da Pagare sul Posto</div>
+                    <div class="kpi-value" style="color: var(--warning)" id="kpiToPay">0,00 €</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW GRAPHICS CARD (LARGER DIAMETER, BETTER VISIBILITY, DETAILED LEGEND) -->
+        <div class="card">
+            <div class="card-header-title">Spese Suddivise per Categoria</div>
+            <div class="graphics-layout">
+                <!-- Large SVG Donut -->
+                <div class="chart-box-main">
+                    <div class="chart-wrapper">
+                        <!-- High stroke size ring for modern robust looks -->
+                        <svg width="100%" height="100%" viewBox="0 0 42 42" id="donutSvg">
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f2f2f7" stroke-width="4.5"></circle>
+                            <!-- Programmatically segmented rings -->
+                        </svg>
+                        <div class="chart-info">
+                            <div class="label">Previsione</div>
+                            <div class="value" id="chartCenterTotal">0€</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Distinguished Legenda Elements Grid Column -->
+                <div class="graph-legend" id="chartLegend">
+                    <!-- Dynamic entries injected via javascript renderer -->
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Operational Split Working Areas -->
+    <div class="workspace-grid">
+        
+        <!-- Insertion Form Panel Component -->
+        <div class="card" style="justify-content: flex-start;">
+            <div class="card-header-title">Aggiungi Voce di Spesa</div>
+            <form id="expenseForm" onsubmit="addExpense(event)">
+                <div class="form-group">
+                    <label for="expTitle">Descrizione voce</label>
+                    <input type="text" id="expTitle" class="form-control" placeholder="Es. Volo A/R, Hotel, Pranzi" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expAmount">Importo (€)</label>
+                    <input type="number" id="expAmount" step="0.01" class="form-control" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="expCategory">Categoria di Spesa</label>
+                    <select id="expCategory" class="form-control" style="background-color: #f5f5f7;">
+                        <option value="trasporto">Trasporto</option>
+                        <option value="cibo">Cibo</option>
+                        <option value="divertimenti">Divertimenti</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="benessere">Benessere</option>
+                        <option value="ristoranti">Ristoranti</option>
+                        <option value="altro">Altro</option>
+                    </select>
+                </div>
+
+                <div class="row-dates">
+                    <div class="form-group">
+                        <label for="expStart">Dal / Il</label>
+                        <input type="date" id="expStart" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expEnd">Al (Opzionale)</label>
+                        <input type="date" id="expEnd" class="form-control">
+                    </div>
+                </div>
+
+                <div class="toggle-wrapper">
+                    <div>
+                        <label style="font-weight: 600; margin-bottom: 2px; font-size: 13px;">Costo già sostenuto</label>
+                        <div style="font-size: 11px; color: var(--text-secondary)">Seleziona se hai già pagato questo importo</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="expPaid">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 12px;">Salva Spesa</button>
+            </form>
+        </div>
+
+        <!-- Expense Log database items output list -->
+        <div class="card" style="justify-content: flex-start;">
+            <div class="card-header-title">Voci della Vacanza Selezionata</div>
+            <div id="expenseList" class="expense-list">
+                <!-- Dynamically injected items inside this area -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Standard Monochromatic Flat Icons Catalog Elements (SVG SF-Style)
+    const iconsMap = {
+        trasporto: `<svg class="icon" viewBox="0 0 24 24"><path d="M5 16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-5H5v5zm14-8H5l1.4-4.2c.3-.8 1-1.3 1.9-1.3h7.4c.9 0 1.6.5 1.9 1.3L19 8z"/></svg>`,
+        cibo: `<svg class="icon" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.25-.25z"/></svg>`,
+        divertimenti: `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>`,
+        shopping: `<svg class="icon" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4zm8 15H4V8h16v11z"/></svg>`,
+        benessere: `<svg class="icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 14.5c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5z"/></svg>`,
+        ristoranti: `<svg class="icon" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>`,
+        altro: `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`
+    };
+
+    // Sophisticated Pastel Elegant Palette Map (Contrast Checked)
+    const colorMap = {
+        trasporto: '#0071e3', // Classic iOS Blue
+        cibo: '#ff9500',      // Warm Orange
+        divertimenti: '#af52de', // Purple
+        shopping: '#ff2d55',  // Vibrant Pink
+        benessere: '#34c759',  // iOS Green
+        ristoranti: '#5ac8fa', // Teal/Cyan
+        altro: '#8e8e93'       // Muted Grey
+    };
+
+    // State Hydration Management Default Setups
+    let appData = {
+        trips: {
+            "Giappone 2026": {
+                budget: 4500,
+                expenses: [
+                    { id: 1, title: "Voli Milano-Tokyo A/R", amount: 980.00, category: "trasporto", start: "2026-10-10", end: "", paid: true },
+                    { id: 2, title: "Hotel Tokyo Centro (6 notti)", amount: 840.00, category: "altro", start: "2026-10-10", end: "2026-10-16", paid: true },
+                    { id: 3, title: "Abbonamento JR Pass 7 giorni", amount: 350.00, category: "trasporto", start: "2026-10-10", end: "2026-10-17", paid: false },
+                    { id: 4, title: "Budget Ristorante Sushi Premium", amount: 160.00, category: "ristoranti", start: "2026-10-12", end: "", paid: false },
+                    { id: 5, title: "Shopping souvenir Kyoto", amount: 120.00, category: "shopping", start: "2026-10-18", end: "", paid: false }
+                ]
+            },
+            "Weekend a Barcellona 2026": {
+                budget: 800,
+                expenses: [
+                    { id: 10, title: "Volo lowcost", amount: 95.00, category: "trasporto", start: "2026-06-05", end: "", paid: true },
+                    { id: 11, title: "Hotel Barceloneta", amount: 240.00, category: "altro", start: "2026-06-05", end: "2026-06-07", paid: true },
+                    { id: 12, title: "Cena Tapas & Sangria", amount: 75.00, category: "cibo", start: "2026-06-06", end: "", paid: false }
+                ]
+            }
+        },
+        currentTrip: "Giappone 2026"
+    };
+
+    // Life-Cycle Bootstrapping Engine
+    window.onload = function() {
+        const saved = localStorage.getItem('smart_travel_data');
+        if (saved) {
+            try {
+                appData = JSON.parse(saved);
+            } catch(e) {
+                console.error("Fallito parse localStorage recovery. Ripristino Mock.", e);
+            }
+        }
+        renderTripSelector();
+        calculateAndRender();
+    };
+
+    function saveState() {
+        localStorage.setItem('smart_travel_data', JSON.stringify(appData));
+    }
+
+    // Dynamic Navigation controls
+    function renderTripSelector() {
+        const selector = document.getElementById('tripSelect');
+        selector.innerHTML = '';
+        Object.keys(appData.trips).forEach(tripName => {
+            const opt = document.createElement('option');
+            opt.value = tripName;
+            opt.innerText = tripName;
+            if(tripName === appData.currentTrip) opt.selected = true;
+            selector.appendChild(opt);
+        });
+    }
+
+    function switchTrip() {
+        appData.currentTrip = document.getElementById('tripSelect').value;
+        saveState();
+        calculateAndRender();
+    }
+
+    function createNewTrip() {
+        const name = prompt("Inserisci il nome identificativo della nuova vacanza:");
+        if (!name || name.trim() === "") return;
+        if (appData.trips[name]) {
+            alert("Esiste già una pianificazione con questo nome.");
+            return;
+        }
+        const bInput = prompt("Imposta un budget complessivo stimato (€):", "2000");
+        const budgetVal = parseFloat(bInput) || 0;
+
+        appData.trips[name] = {
+            budget: budgetVal,
+            expenses: []
+        };
+        appData.currentTrip = name;
+        saveState();
+        renderTripSelector();
+        calculateAndRender();
+    }
+
+    function deleteCurrentTrip() {
+        const keys = Object.keys(appData.trips);
+        if(keys.length <= 1) {
+            alert("Impossibile eliminare l'unica vacanza rimasta in elenco. Creane prima un'altra.");
+            return;
+        }
+        if(!confirm(`Sei sicuro di voler eliminare definitivamente "${appData.currentTrip}" e tutte le spese associate?`)) return;
+        
+        delete appData.trips[appData.currentTrip];
+        appData.currentTrip = Object.keys(appData.trips)[0];
+        saveState();
+        renderTripSelector();
+        calculateAndRender();
+    }
+
+    // Interactive Transactional Adders
+    function addExpense(e) {
+        e.preventDefault();
+        const trip = appData.trips[appData.currentTrip];
+        
+        const newExpense = {
+            id: Date.now(),
+            title: document.getElementById('expTitle').value,
+            amount: parseFloat(document.getElementById('expAmount').value) || 0,
+            category: document.getElementById('expCategory').value,
+            start: document.getElementById('expStart').value,
+            end: document.getElementById('expEnd').value,
+            paid: document.getElementById('expPaid').checked
+        };
+
+        trip.expenses.push(newExpense);
+        saveState();
+        calculateAndRender();
+        
+        // Dynamic soft UI resets
+        document.getElementById('expenseForm').reset();
+    }
+
+    function deleteExpense(id) {
+        const trip = appData.trips[appData.currentTrip];
+        trip.expenses = trip.expenses.filter(item => item.id !== id);
+        saveState();
+        calculateAndRender();
+    }
+
+    // Core Consolidated Computational Algorithm Engine
+    function calculateAndRender() {
+        const currentSelectedTrip = appData.trips[appData.currentTrip] || { budget: 0, expenses: [] };
+        
+        // Single Trip Metric Collectors
+        let localTotal = 0;
+        let localPaid = 0;
+        let localToPay = 0;
+        let absoluteMinDate = null;
+        let absoluteMaxDate = null;
+        let catTotals = { trasporto: 0, cibo: 0, divertimenti: 0, shopping: 0, benessere: 0, ristoranti: 0, altro: 0 };
+
+        // Global Consolidation Aggregators (ALL TRIPS)
+        let globalGrandTotalAllTrips = 0;
+        let globalToPayAllTrips = 0;
+
+        // Iteration across entire multi-trip data structure mapping portfolio KPIs
+        Object.keys(appData.trips).forEach(tripName => {
+            const trip = appData.trips[tripName];
+            trip.expenses.forEach(exp => {
+                globalGrandTotalAllTrips += exp.amount;
+                if(!exp.paid) {
+                    globalToPayAllTrips += exp.amount;
+                }
+
+                // If evaluating currently selected, capture local attributes
+                if(tripName === appData.currentTrip) {
+                    const val = exp.amount;
+                    localTotal += val;
+                    catTotals[exp.category] += val;
+
+                    if(exp.paid) {
+                        localPaid += val;
+                    } else {
+                        localToPay += val;
+                    }
+
+                    if(exp.start) {
+                        const dStart = new Date(exp.start);
+                        if(!absoluteMinDate || dStart < absoluteMinDate) absoluteMinDate = dStart;
+                        if(!absoluteMaxDate || dStart > absoluteMaxDate) absoluteMaxDate = dStart;
+                    }
+                    if(exp.end) {
+                        const dEnd = new Date(exp.end);
+                        if(!absoluteMaxDate || dEnd > absoluteMaxDate) absoluteMaxDate = dEnd;
+                    }
+                }
+            });
+        });
+
+        // 1. Output Portfolio (ALL TRIPS Global values)
+        document.getElementById('globalKpiTotal').innerText = globalGrandTotalAllTrips.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        document.getElementById('globalKpiToPay').innerText = globalToPayAllTrips.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+
+        // 2. Output Selected active trip local calculations
+        document.getElementById('kpiTotal').innerText = localTotal.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        document.getElementById('kpiBudget').innerText = currentSelectedTrip.budget.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        document.getElementById('kpiPaid').innerText = localPaid.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        document.getElementById('kpiToPay').innerText = localToPay.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        document.getElementById('chartCenterTotal').innerText = Math.round(localTotal) + " €";
+
+        // Local duration calculation metric
+        let daysCount = 1;
+        if(absoluteMinDate && absoluteMaxDate) {
+            const timeDiff = absoluteMaxDate.getTime() - absoluteMinDate.getTime();
+            daysCount = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+        }
+        const dailyAvg = localTotal / daysCount;
+        document.getElementById('kpiDailyAvg').innerText = dailyAvg.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+
+        // Build charts and legends dynamically 
+        renderEnhancedDonutChart(catTotals, localTotal);
+        renderExpenseList(currentSelectedTrip.expenses);
+    }
+
+    // Dynamic Render Engine for Donut SVG Segmentations and Legenda Grid Items
+    function renderEnhancedDonutChart(catTotals, globalTotal) {
+        const svg = document.getElementById('donutSvg');
+        const legendContainer = document.getElementById('chartLegend');
+        
+        // Empty old segments of dynamic rings & elements
+        const dynamicallyGeneratedRings = svg.querySelectorAll('.dynamic-stroke');
+        dynamicallyGeneratedRings.forEach(node => node.remove());
+        legendContainer.innerHTML = '';
+
+        if (globalTotal === 0) {
+            // Empty state for visual graph representation
+            legendContainer.innerHTML = `<div class="empty-state">Nessuna categoria attiva. Aggiungi spese.</div>`;
+            return;
+        }
+
+        let cumulativePercent = 0;
+
+        // Build items into descending impact order matrix to ensure beautiful legends structure
+        const sortedCategories = Object.keys(catTotals)
+            .map(cat => ({ category: cat, val: catTotals[cat] }))
+            .sort((a, b) => b.val - a.val);
+
+        sortedCategories.forEach(item => {
+            if (item.val === 0) return;
+
+            const percentage = (item.val / globalTotal) * 100;
+            const strokeDashArray = `${percentage} ${100 - percentage}`;
+            const strokeDashOffset = 100 - cumulativePercent + 25; // standard alignment to rotation starting apex
+
+            // 1. Append circle sector node into SVG tree
+            const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circleNode.setAttribute("class", "dynamic-stroke");
+            circleNode.setAttribute("cx", "21");
+            circleNode.setAttribute("cy", "21");
+            circleNode.setAttribute("r", "15.915");
+            circleNode.setAttribute("fill", "transparent");
+            circleNode.setAttribute("stroke", colorMap[item.category]);
+            circleNode.setAttribute("stroke-width", "4.8"); // Thick Apple watch profile indicator styles
+            circleNode.setAttribute("stroke-dasharray", strokeDashArray);
+            circleNode.setAttribute("stroke-dashoffset", strokeDashOffset.toString());
+            
+            svg.appendChild(circleNode);
+            cumulativePercent += percentage;
+
+            // 2. Append rich information row to side Legend element block
+            const legendRow = document.createElement('div');
+            legendRow.className = 'legend-item';
+            legendRow.innerHTML = `
+                <div class="legend-item-left">
+                    <span class="legend-color-dot" style="background-color: ${colorMap[item.category]};"></span>
+                    <span class="legend-cat-name">${item.category}</span>
+                </div>
+                <div class="legend-item-right">
+                    <span class="legend-val">${item.val.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' })}</span>
+                    <span class="legend-pct">(${Math.round(percentage)}%)</span>
+                </div>
+            `;
+            legendContainer.appendChild(legendRow);
+        });
+    }
+
+    function renderExpenseList(expenses) {
+        const container = document.getElementById('expenseList');
+        container.innerHTML = '';
+
+        if(expenses.length === 0) {
+            container.innerHTML = `<div class="empty-state">Nessuna voce registrata per questa vacanza. Aggiungi la prima a sinistra.</div>`;
+            return;
+        }
+
+        // Standard timeline sorted view descending chronologically
+        const items = [...expenses].sort((a,b) => new Date(b.start) - new Date(a.start));
+
+        items.forEach(item => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'expense-item';
+            
+            const localizedDate = new Date(item.start).toLocaleDateString('it-IT');
+            const rangeInfo = item.end ? `dal ${localizedDate} al ${new Date(item.end).toLocaleDateString('it-IT')}` : localizedDate;
+            
+            const badgeClass = item.paid ? 'paid' : 'pending';
+            const badgeLabel = item.paid ? 'Già Pagato' : 'Da Pagare';
+
+            wrapper.innerHTML = `
+                <div class="expense-item-left">
+                    <div class="category-icon-wrapper" style="color: ${colorMap[item.category]}; background-color: ${colorMap[item.category]}15">
+                        ${iconsMap[item.category]}
+                    </div>
+                    <div class="expense-details">
+                        <div class="title">${item.title}</div>
+                        <div class="meta">${rangeInfo} • <span style="text-transform: capitalize;">${item.category}</span></div>
+                    </div>
+                </div>
+                <div class="expense-item-right">
+                    <div class="expense-price">
+                        <div class="amount">${item.amount.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' })}</div>
+                        <span class="status-badge ${badgeClass}">${badgeLabel}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteExpense(${item.id})" title="Rimuovi">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    </button>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        });
+    }
+
+    // Input-Output Systems File Operations
+    function triggerImportJSON() { document.getElementById('fileInput').click(); }
+    
+    function exportJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", `travel_budget_backup.json`);
+        dlAnchorElem.click();
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if(parsed.trips && parsed.currentTrip) {
+                    appData = parsed;
+                    saveState();
+                    renderTripSelector();
+                    calculateAndRender();
+                    alert("Backup JSON caricato con successo!");
+                } else {
+                    alert("Struttura database JSON non conforme.");
+                }
+            } catch(err) {
+                alert("Errore nel parse del file JSON.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function triggerImportCSV() { document.getElementById('excelInput').click(); }
+
+    function exportCSV() {
+        const trip = appData.trips[appData.currentTrip];
+        if(!trip || trip.expenses.length === 0) {
+            alert("Nessun dato presente da esportare.");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,Descrizione;Importo;Categoria;Data Inizio;Data Fine;Gia Pagato\r\n";
+        
+        trip.expenses.forEach(exp => {
+            const paidFlag = exp.paid ? "SI" : "NO";
+            const cleanTitle = exp.title.replace(/;/g, ',');
+            const row = `${cleanTitle};${exp.amount};${exp.category};${exp.start};${exp.end || ''};${paidFlag}`;
+            csvContent += row + "\r\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `budget_${appData.currentTrip.replace(/\s+/g, '_')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function importCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const lines = text.split(/\r?\n/);
+            if(lines.length <= 1) return;
+
+            const importedExpenses = [];
+            
+            for(let i = 1; i < lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                const columns = lines[i].split(';');
+                if(columns.length < 3) continue;
+
+                importedExpenses.push({
+                    id: Date.now() + i,
+                    title: columns[0] ? columns[0].trim() : "Importato",
+                    amount: parseFloat(columns[1]) || 0,
+                    category: columns[2] ? columns[2].trim().toLowerCase() : "altro",
+                    start: columns[3] ? columns[3].trim() : new Date().toISOString().split('T')[0],
+                    end: columns[4] ? columns[4].trim() : "",
+                    paid: columns[5] && columns[5].trim().toUpperCase() === "SI"
+                });
+            }
+
+            if(importedExpenses.length > 0) {
+                const importTripName = `Import CSV ${new Date().toLocaleDateString('it-IT')}`;
+                appData.trips[importTripName] = {
+                    budget: 0,
+                    expenses: importedExpenses
+                };
+                appData.currentTrip = importTripName;
+                saveState();
+                renderTripSelector();
+                calculateAndRender();
+                alert(`CSV importato! Create ${importedExpenses.length} voci sotto la vacanza "${importTripName}"`);
+            } else {
+                alert("Nessuna riga valida importabile identificata nel CSV.");
+            }
+        };
+        reader.readAsText(file);
+    }
+</script>
+
+</body>
+</html>
+``` eof
+
+### Cosa rende migliore questa versione:
+*   **Modulo Portafoglio Vacanze Globale (Fisso in alto):** L'applicazione ora aggrega *tutte* le spese caricate nel database (indipendentemente dalla vacanza selezionata). Vedrai la spesa globale consolidata e la quantità di liquidità totale che dovrai ancora preparare per tutti i viaggi in arrivo.
+*   **Visualizzazione Grafica Rinforzata:** La ciambella SVG è passata ad uno spessore di `4.8` (molto più corposo e moderno, che evita segmenti sottili difficili da mirare). L'intera area del grafico è scalata per una lettura immediata.
+*   **Legenda Dettagliata Intuitiva:** L'elenco ordinato per rilevanza (*decrescente*) mostra i colori abbinati, i nomi, le cifre precise in euro e la percentuale sul totale. Ora distinguere a colpo d'occhio cosa impatta di più (es. Trasporti 45%) è facilissimo.
+*   **Archiviazione Locale Istantanea:** Ad ogni aggiunta o cambio di stato, l'app sincronizza i dati su `localStorage` in background.
