@@ -324,8 +324,8 @@
 
         .chart-wrapper {
             position: relative;
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
         }
 
         .chart-info {
@@ -717,7 +717,7 @@
                     <div class="chart-wrapper">
                         <!-- High stroke size ring for modern robust looks -->
                         <svg width="100%" height="100%" viewBox="0 0 42 42" id="donutSvg">
-                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f2f2f7" stroke-width="4.5"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f2f2f7" stroke-width="8"></circle>
                             <!-- Programmatically segmented rings -->
                         </svg>
                         <div class="chart-info">
@@ -828,26 +828,12 @@
     // State Hydration Management Default Setups
     let appData = {
         trips: {
-            "Giappone 2026": {
-                budget: 4500,
-                expenses: [
-                    { id: 1, title: "Voli Milano-Tokyo A/R", amount: 980.00, category: "trasporto", start: "2026-10-10", end: "", paid: true },
-                    { id: 2, title: "Hotel Tokyo Centro (6 notti)", amount: 840.00, category: "altro", start: "2026-10-10", end: "2026-10-16", paid: true },
-                    { id: 3, title: "Abbonamento JR Pass 7 giorni", amount: 350.00, category: "trasporto", start: "2026-10-10", end: "2026-10-17", paid: false },
-                    { id: 4, title: "Budget Ristorante Sushi Premium", amount: 160.00, category: "ristoranti", start: "2026-10-12", end: "", paid: false },
-                    { id: 5, title: "Shopping souvenir Kyoto", amount: 120.00, category: "shopping", start: "2026-10-18", end: "", paid: false }
-                ]
-            },
-            "Weekend a Barcellona 2026": {
-                budget: 800,
-                expenses: [
-                    { id: 10, title: "Volo lowcost", amount: 95.00, category: "trasporto", start: "2026-06-05", end: "", paid: true },
-                    { id: 11, title: "Hotel Barceloneta", amount: 240.00, category: "altro", start: "2026-06-05", end: "2026-06-07", paid: true },
-                    { id: 12, title: "Cena Tapas & Sangria", amount: 75.00, category: "cibo", start: "2026-06-06", end: "", paid: false }
-                ]
+            "La Mia Vacanza": {
+                budget: 0,
+                expenses: []
             }
         },
-        currentTrip: "Giappone 2026"
+        currentTrip: "La Mia Vacanza"
     };
 
     // Life-Cycle Bootstrapping Engine
@@ -1065,7 +1051,7 @@
             circleNode.setAttribute("r", "15.915");
             circleNode.setAttribute("fill", "transparent");
             circleNode.setAttribute("stroke", colorMap[item.category]);
-            circleNode.setAttribute("stroke-width", "4.8"); // Thick Apple watch profile indicator styles
+            circleNode.setAttribute("stroke-width", "8"); // Thick Apple watch profile indicator styles
             circleNode.setAttribute("stroke-dasharray", strokeDashArray);
             circleNode.setAttribute("stroke-dashoffset", strokeDashOffset.toString());
             
